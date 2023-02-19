@@ -1,0 +1,17 @@
+{
+    "manifest_version": 3,
+   
+    "name": "cstimer optclock",
+    "version": "1.0.0",
+    "description": "displays optimal movecount for the previous scramble",
+    
+    "content_scripts": [{
+      "js": ["content.js"],
+      "matches": ["https://cstimer.net/*"]
+      
+    }],
+    "web_accessible_resources": [{
+      "resources": ["optclock.wasm"],
+      "matches": ["https://cstimer.net/*"]
+    }]
+}
