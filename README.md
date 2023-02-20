@@ -1,6 +1,6 @@
 # Please read this!
 
-note: this does not work with cstimer+
+Note: this does not work with cstimer+.
 After installing this extension, open up the tools selector and choose optclock. The optimal movecount will now be displayed when you hit next scramble. It is important to note that you won't be able to click any buttons while the optimal solution is being generated, so don't try to spam the next scramble button when optclock is your selected tool.
 
 To install this extension on chrome:
