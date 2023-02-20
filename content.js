@@ -6,26 +6,85 @@ const scramble = document.querySelector("#scrambleTxt")
 const tools = document.querySelector("#toolsDiv").querySelector('div:first-child').querySelector('div:first-child');
 const toolSelect = document.querySelector("#optclock").closest("select");
 var previousOptimal="available for next scramble"
+var getSolution=false;
+var solution=""
+var currentSolution=""
 
 const originalLog = console.log;
 console.log = function(...args) {
-  originalLog.apply(console, args);
-
-  if (args.find(arg => typeof arg === "string" && arg.includes("moves"))){
-    previousOptimal=args.find(arg => typeof arg === "string" && arg.includes("moves")).split(" ")[0]+" moves";
-  }
+    originalLog.apply(console, args);
+    if (args.find(arg => typeof arg === "string" && arg.includes("moves"))){
+        previousOptimal=args.find(arg => typeof arg === "string" && arg.includes("moves")).split(" ")[0]+" moves";
+        getSolution=true;
+    }
+  else if (getSolution==true){
+        currentSolution=args+""
+        getSolution=false;
+    }
 }
 function checkEvent(){
     const selectors = document.getElementsByTagName('select');
     for (let i = 0; i < selectors.length; i++) {
         if (selectors[i].value == 'clkwca' && toolSelect.value == "optclock" && scramble.innerText != "Scrambling...")
         {
-            tools.innerHTML = `previous scramble optimal:<br>${previousOptimal}`;
-            fetchOutput(convert(scramble.innerText))
+            tools.innerHTML = `previous scramble optimal:<br><a id="showSolution"><u>${previousOptimal}</u></a>`;
+            solution=currentSolution
+            fetchOutput(convert(scramble.innerText));
+            document.querySelector("#showSolution").addEventListener("click",showSolution);
             break;
         }
     }
 }
+
+function showSolution(){
+    let final = "";
+    const fpins = {UDDD: "UL", DUDD: "UR", DDUD: "DL", DDDU: "DR", UUDD: "U", DDUU: "D", DUDU: "R", UDUD: "L", UDDU: "\\", DUUD: "/", UUUU: "ALL", DDDD: "all", DUUU: "ul", UDUU: "ur", UUDU: "dl", UUUD: "dr"}
+    const bpins = {UDDD: "ur", DUDD: "ul", DDUD: "dr", DDDU: "dl", UUDD: "D", DDUU: "U", DUDU: "R", UDUD: "L", UDDU: "\\", DUUD: "/", UUUU: "all", DDDD: "all", DUUU: "UR", UDUU: "UL", UUDU: "DR", UUUD: "DL"}
+    let s = solution.split(" ");
+    for (let i=0; i<s.length; i++){
+        if (s[i].includes("u")){
+            final+= fpins[s[i-1]]
+            if (s[i]=="u"){
+                final+="1+ "
+            }
+            else if (s[i]=="u'"){
+                final+="1- "
+            }
+            else {
+                final+=s[i][1]
+                if(s[i].includes("'")){
+                    final+="- "
+                }
+                else{
+                    final+="+ "
+                }
+            }
+        }
+    }
+    final+="y2 "
+    for (let i=0; i<s.length; i++){
+        if (s[i].includes("d")){
+            final+= bpins[s[i-1]]
+            if (s[i]=="d"){
+                final+="1- "
+            }
+            else if (s[i]=="d'"){
+                final+="1+ "
+            }
+            else {
+                final+=s[i][1]
+                if(s[i].includes("'") || s[i][1]=='6'){
+                    final+="+ "
+                }
+                else{
+                    final+="- "
+                }
+            }
+        }
+    }
+    tools.innerHTML += `<br>${final}`;
+}
+
 function convert(s){
     n=[0,0,0,0,0,0,0,0,0,0,0,0,0,0];
     let effects = [[0, 9, 11, 12], [6, 11, 12, 13], [8, 10, 11, 13], [2, 9, 10, 11], [0, 2, 9, 10, 11, 12], [0, 6, 9, 11, 12, 13], [6, 8, 10, 11, 12, 13], [2, 8, 9, 10, 11, 13], [0, 2, 6, 8, 9, 10, 11, 12, 13], [0, 1, 2, 3, 4, 5], [1, 2, 4, 5, 7, 8], [3, 4, 5, 6, 7, 8], [0, 1, 3, 4, 6, 7], [0, 1, 2, 3, 4, 5, 6, 7, 8]];
@@ -57,4 +116,3 @@ mutationObserver.observe(document.getElementById("scrambleTxt"), {
     childList: true,
     subtree: true, 
 })
-
